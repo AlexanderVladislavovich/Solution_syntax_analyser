@@ -24,12 +24,13 @@ int queue<T>::next(int a)
 template<typename T>
 bool queue<T>::IsEmpty()
 {
-  return 
+  return next(next(end)) == start;
 }
+
 template<typename T>
 bool queue<T>::IsFull()
 {
-  return 
+  return;
 }
 template<typename T>
 void queue<T>::push(T a)
