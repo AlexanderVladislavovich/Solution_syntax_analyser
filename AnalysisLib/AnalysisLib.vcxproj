@@ -139,10 +139,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ReversePolish.cpp" />
-    <ClCompile Include="syntax.cpp" />
+    <ClCompile Include="Errors.cpp" />
+    <ClCompile Include="ReversePolish.h" />
+    <ClCompile Include="Syntax.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Calculator.h" />
     <ClInclude Include="ElementTypes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

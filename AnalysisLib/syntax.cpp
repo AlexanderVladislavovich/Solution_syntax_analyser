@@ -1,18 +1,11 @@
 #pragma once
 #include <string>
 #include <iostream>
-#include <stack> // сделать свой
-#include <queue> // сделать свой
-//вместо switch можно сделать список(массив) правил
-//базовый класс rool, три метода: перейти, чек и действие
-//сделать отдельными классами лексический, синтаксический анализы и транслятор
+#include <stack>
+#include <queue> 
+//#include "Errors.cpp"
 #include "ElementTypes.h"
 using namespace std;
-
-//enum TypeElement {
-//	Operation,
-//	Value
-//};
 
 class Lexema 
 {
@@ -35,75 +28,99 @@ public:
 		}
 		else if (p.type == Value) {
 			out << "value";
-		};
+		}
+		else if (p.type == Floatp)
+		{
+			out << "float";
+		}
+		else if (p.type == UnOP)
+		{
+			cout << "unary operation";
+		}
 		out << "}";
 		return out;
 	}
 
 	int Priority()
 	{
-		if (str == "(" || str == ")") return 0;
-		if (str == "+" || str == "-") return 1;
-		if (str == "*" || str == "/") return 2;
-		if (str == ".") return 3;
-		if (str == "^") return 4;
-		return -1;//ex
+		if (type == Operation)
+		{
+			if (str == "(" || str == ")") return 0;
+			if (str == "+" || str == "-") return 1;
+			if (str == "*" || str == "/") return 2;
+			if (str == "^") return 3;
+		}
+		if (type == UnOP)
+		{
+			return 4;
+		}
+		return -1;
 	}
 };
 
-queue <Lexema> lex(string input) 
+queue <Lexema> lex(string input)
 {
 	queue<Lexema>res;
 	input += ' ';
 	int i = 0;
 	string tmp = "";
-	string binop = "+-*/()";
-	string unop = "-.";
+	string binop = "+-*/()^";
+	string unop = "-";
 	string sep = " \n\t";
 	int state = 0;
+	int open = 0, close = 0;
 
-	for (i = 0; i < input.size(); i++) 
+	for (i = 0; i < input.size(); i++)
 	{
 		char c = input[i];
 		int fres;
 		switch (state)
 		{
-		case 0: // операция
-			if (c >= '0' && c <= '9') 
+		case 0:
+			if (c >= '0' && c <= '9')
 			{
 				tmp = c;
 				state = 1;
 				break;
 			}
-			fres = binop.find(c);
-			if (fres >= 0) 
+
+			if (c == '-' && (res.empty() || res.back().getType() == Operation))
 			{
 				tmp = c;
-				Lexema l(tmp, Operation);
+				Lexema l(tmp, UnOP);
 				res.push(l);
 				state = 0;
 				break;
 			}
-			//fres = unop.find(c);
-			/*if (fres >= 0 && c == '-')
+			fres = binop.find(c);
+			if (fres >= 0)
 			{
+				if (c == '(') open += 1;
+				if (c == ')') close += 1;
 				tmp = c;
 				Lexema l(tmp, Operation);
 				res.push(l);
-				state = 1;
 				break;
-			}*/
+			}
 			break;
-		case 1: // число
-			if (c >= '0' && c <= '9') 
+		case 1: //число
+			if (c >= '0' && c <= '9')
 			{
 				tmp += c;
 				state = 1;
 				break;
 			}
-			fres = binop.find(c);
-			if (fres >= 0) 
+			if (c == '.')
 			{
+				tmp += c;
+				state = 2;
+				break;
+			}
+			fres = binop.find(c);
+			if (fres >= 0)
+			{
+				if (c == '(') open += 1;
+				if (c == ')') close += 1;
 				Lexema l1(tmp, Value);
 				res.push(l1);
 				tmp = c;
@@ -113,7 +130,7 @@ queue <Lexema> lex(string input)
 				break;
 			}
 			fres = sep.find(c);
-			if (fres >= 0) 
+			if (fres >= 0)
 			{
 				Lexema l(tmp, Value);
 				res.push(l);
@@ -121,23 +138,51 @@ queue <Lexema> lex(string input)
 				break;
 			}
 			break;
+		case 2:  //дробная часть
+			if (c >= '0' && c <= '9')
+			{
+				tmp += c;
+				state = 3;
+				break;
+			}
+
+			throw - 1;
+		case 3:  //число с плав. точкой
+			if (c >= '0' && c <= '9')
+			{
+				tmp += c;
+				state = 3;
+				break;
+			}
+			fres = binop.find(c);
+			if (fres >= 0)
+			{
+				if (c == '(') open += 1;
+				if (c == ')') close += 1;
+				Lexema l(tmp, Floatp);
+				res.push(l);
+				state = 0;
+				break;
+			}
+			fres = sep.find(c);
+			if (fres >= 0)
+			{
+				Lexema l(tmp, Floatp);
+				res.push(l);
+				state = 0;
+				break;
+			}
 		}
+		
 	}
+	if (close < open) throw - 1;
+	if (close > open) throw - 1;
 	return res;
 }
-
-void print(queue <Lexema> t) {
+void print(queue <Lexema> t) 
+{
 	while (!t.empty()) {
 		cout << t.front() << endl;
 		t.pop();
 	}
 }
-
-//int main() {
-//	string str = "( 123 -10)/ 50 *	\t	30 \n";
-//	cout << str;
-//	queue <Lexema> lex_res;
-//	lex_res = lex(str);
-//	print(lex_res);
-//	return 0;
-//}

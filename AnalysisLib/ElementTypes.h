@@ -2,5 +2,5 @@
 
 enum TypeElem
 {
-  Value, Operation, NullType
+  Value, Floatp, Operation, UnOP ,NullType
 };

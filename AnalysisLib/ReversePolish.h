@@ -13,9 +13,13 @@ queue<Lexema>  postfix(queue<Lexema> a)
   {
     l1 = a.front();
 
-    if (l1.getType() == Value)
+    if (l1.getType() == Value || l1.getType() == Floatp)
     {
       q1.push(l1);
+    }
+    else if (l1.getType() == UnOP)
+    {
+      s1.push(l1);
     }
     else if (l1.getStr() == "(")
     {
