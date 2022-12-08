@@ -1,18 +1,19 @@
 #pragma once
-#include <queue>
-#include <stack>
-#include "../AnalysisLib/syntax.cpp"
-
-
+//#include <queue>
+//#include <stack>
+//#include "../AnalysisLib/syntax.cpp"
+#include "Lexema.h"
+#include "Errors.h"
 queue<Lexema>  postfix(queue<Lexema> a)
 {
   stack<Lexema> s1;
   Lexema l1("", NullType);
   queue<Lexema> q1;
+
   while (!a.empty())
   {
     l1 = a.front();
-
+   
     if (l1.getType() == Value || l1.getType() == Floatp)
     {
       q1.push(l1);
@@ -24,6 +25,7 @@ queue<Lexema>  postfix(queue<Lexema> a)
     else if (l1.getStr() == "(")
     {
       s1.push(l1);
+      
     }
     else if (l1.getStr() == ")")
     {
@@ -31,8 +33,10 @@ queue<Lexema>  postfix(queue<Lexema> a)
       {
         q1.push(s1.top());
         s1.pop();
+        if (s1.empty()) throw MissingOperator({ "(" ,Operation }, "Missing operator");
       }
       s1.pop();
+
     }
     else if (l1.getType() == Operation)
     {
@@ -54,12 +58,13 @@ queue<Lexema>  postfix(queue<Lexema> a)
       {
         s1.push(l1);
       }
-     
+
     }
     a.pop();
   }
   while (!s1.empty())
   {
+    if (s1.top().getStr() == "(") throw MissingOperator({ ")" ,Operation }, "Missing operator");
     q1.push(s1.top());
     s1.pop();
   }

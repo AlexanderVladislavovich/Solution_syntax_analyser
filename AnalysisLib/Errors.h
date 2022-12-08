@@ -1,6 +1,7 @@
 #pragma once
-#include "Syntax.cpp"
+//#include "Syntax.cpp"
 #include <iostream>
+#include "Lexema.h"
 using namespace std;
 
 
@@ -13,22 +14,36 @@ public:
 class UnexpectedOpertation :public Errors
 {
   Lexema l;
+  string what;
 public:
-  UnexpectedOpertation(Lexema _l) :l(_l) {}
+  UnexpectedOpertation(Lexema _l, string _what) :l(_l), what(_what) {}
   void GetException()
   {
-		cout << "Unexpected operation" << ':' << l.getStr() << endl;
+		cout << what << ' ' << l.getStr() << endl;
   }
 
 };
 class MissingOperator :public Errors
 {
   Lexema l;
+  string what;
 public:
-  MissingOperator(Lexema _l) :l(_l) {}
+  MissingOperator(Lexema _l, string _what) :l(_l), what(_what) {}
   void GetException()
   {
-    cout << "Missing operator" << ':' << l.getStr() << endl;
+    cout << what << ' ' << l.getStr() << endl;
+  }
+};
+
+class MissingOperand :public Errors
+{
+  Lexema l;
+  string what;
+public:
+  MissingOperand(Lexema _l, string _what) : l(_l) ,what(_what) {}
+  void GetException()
+  {
+    cout << what /*<< " " << l.getStr()*/ << endl;
   }
 };
 //class Exception
